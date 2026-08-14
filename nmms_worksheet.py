@@ -30,19 +30,23 @@ current_questions = df[df['Worksheet'] == selected_worksheet]
 st.title(f"📝 {selected_worksheet}")
 st.markdown("---")
 
-# 1. Create a unique memory key for this specific worksheet
+# 1. Create unique memory keys
 submit_key = f"submit_{selected_worksheet}"
+reset_key = f"reset_{selected_worksheet}" # NEW: Our reset counter
+
 if submit_key not in st.session_state:
     st.session_state[submit_key] = False
+    
+if reset_key not in st.session_state:
+    st.session_state[reset_key] = 0
 
-# 2. This function triggers when the student hits Submit
 def mark_as_submitted():
     st.session_state[submit_key] = True
 
 score = 0
 total = 0
 
-with st.form(key=f"form_{selected_worksheet}"):
+with st.form(key=f"form_{selected_worksheet}_{st.session_state[reset_key]}"):
     user_answers = {}
     
     for q_num, (index, row) in enumerate(current_questions.iterrows(), start=1):
@@ -60,15 +64,15 @@ with st.form(key=f"form_{selected_worksheet}"):
         
         st.markdown(f"**{q_num}. {question_text}**")
         
+        # 2. Attach the reset counter to the radio button's key
         user_answers[index] = st.radio(
             "Select answer:", 
             [opt1, opt2, opt3, opt4],
-            key=f"q_{index}",
+            key=f"q_{index}_{st.session_state[reset_key]}", 
             label_visibility="collapsed",
             index=None 
         )
         
-        # 3. If submitted, instantly reveal the feedback right below the question
         if st.session_state[submit_key]:
             user_ans = user_answers[index]
             
@@ -88,19 +92,13 @@ with st.form(key=f"form_{selected_worksheet}"):
                 
         st.write("---") 
         
-    # 4. The button now tells the app to remember the submission
     submitted = st.form_submit_button("Submit & Review", on_click=mark_as_submitted)
 
-# 5. Show the final score and a restart option at the bottom
 if st.session_state[submit_key]:
     st.markdown(f"## 📊 Final Score: {score} out of {total}")
     
+    # 3. Increment the counter to force Streamlit to draw brand new, blank buttons
     if st.button("Restart Test"):
         st.session_state[submit_key] = False
-        
-        # NEW FIX: Clear the memory of every specific radio button so they deselect
-        for index in current_questions.index:
-            if f"q_{index}" in st.session_state:
-                del st.session_state[f"q_{index}"]
-                
+        st.session_state[reset_key] += 1 
         st.rerun()
