@@ -97,4 +97,10 @@ if st.session_state[submit_key]:
     
     if st.button("Restart Test"):
         st.session_state[submit_key] = False
+        
+        # NEW FIX: Clear the memory of every specific radio button so they deselect
+        for index in current_questions.index:
+            if f"q_{index}" in st.session_state:
+                del st.session_state[f"q_{index}"]
+                
         st.rerun()
