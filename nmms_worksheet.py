@@ -30,75 +30,69 @@ current_questions = df[df['Worksheet'] == selected_worksheet]
 st.title(f"📝 {selected_worksheet}")
 st.markdown("---")
 
-# 1. Create unique memory keys
-submit_key = f"submit_{selected_worksheet}"
-reset_key = f"reset_{selected_worksheet}" # NEW: Our reset counter
+# We only need the reset key now. No submit key needed since it is instant!
+reset_key = f"reset_{selected_worksheet}" 
 
-if submit_key not in st.session_state:
-    st.session_state[submit_key] = False
-    
 if reset_key not in st.session_state:
     st.session_state[reset_key] = 0
 
-def mark_as_submitted():
-    st.session_state[submit_key] = True
-
 score = 0
 total = 0
+answered_count = 0
 
-with st.form(key=f"form_{selected_worksheet}_{st.session_state[reset_key]}"):
-    user_answers = {}
-    
-    for q_num, (index, row) in enumerate(current_questions.iterrows(), start=1):
-        question_text = row['Question']
-        
-        if pd.isna(question_text):
-            continue
-            
-        total += 1
-        opt1 = str(row['Option_1'])
-        opt2 = str(row['Option_2'])
-        opt3 = str(row['Option_3'])
-        opt4 = str(row['Option_4'])
-        correct_ans = str(row['Correct_Answer']).strip()
-        
-        st.markdown(f"**{q_num}. {question_text}**")
-        
-        # 2. Attach the reset counter to the radio button's key
-        user_answers[index] = st.radio(
-            "Select answer:", 
-            [opt1, opt2, opt3, opt4],
-            key=f"q_{index}_{st.session_state[reset_key]}", 
-            label_visibility="collapsed",
-            index=None 
-        )
-        
-        if st.session_state[submit_key]:
-            user_ans = user_answers[index]
-            
-            if user_ans is None:
-                st.warning(f"You left this blank. **Correct Answer: {correct_ans}**")
-            else:
-                user_ans = str(user_ans).strip()
-                if user_ans == correct_ans:
-                    score += 1
-                    st.success("**Correct!**")
-                else:
-                    st.error(f"**Incorrect.** You selected: {user_ans} | **Correct Answer: {correct_ans}**")
-            
-            explanation = str(row['Explanation'])
-            if explanation != 'nan' and explanation.strip() != '':
-                st.info(f"💡 Explanation: {explanation}")
-                
-        st.write("---") 
-        
-    submitted = st.form_submit_button("Submit & Review", on_click=mark_as_submitted)
+# Notice there is no 'with st.form():' anymore. 
+# Every click instantly triggers the logic below!
 
-if st.session_state[submit_key]:
-    st.markdown(f"## 📊 Final Score: {score} out of {total}")
+for q_num, (index, row) in enumerate(current_questions.iterrows(), start=1):
+    question_text = row['Question']
     
-    # 3. Increment the counter to force Streamlit to draw brand new, blank buttons
-    if st.button("Restart Test"):
-        st.session_state[submit_key] = False
-        st.session_state[reset_key] += 1 
-        st.rerun()
+    if pd.isna(question_text):
+        continue
+        
+    total += 1
+    opt1 = str(row['Option_1'])
+    opt2 = str(row['Option_2'])
+    opt3 = str(row['Option_3'])
+    opt4 = str(row['Option_4'])
+    correct_ans = str(row['Correct_Answer']).strip()
+    
+    st.markdown(f"**{q_num}. {question_text}**")
+    
+    # The radio button will trigger an instant update when clicked
+    user_ans = st.radio(
+        "Select answer:", 
+        [opt1, opt2, opt3, opt4],
+        key=f"q_{index}_{st.session_state[reset_key]}", 
+        label_visibility="collapsed",
+        index=None 
+    )
+    
+    # INSTANT FEEDBACK LOGIC
+    # If user_ans is not None, it means the student just clicked an option
+    if user_ans is not None:
+        answered_count += 1
+        user_ans = str(user_ans).strip()
+        
+        if user_ans == correct_ans:
+            score += 1
+            st.success("**Correct!**")
+        else:
+            st.error(f"**Incorrect.** You selected: {user_ans} | **Correct Answer: {correct_ans}**")
+        
+        explanation = str(row['Explanation'])
+        if explanation != 'nan' and explanation.strip() != '':
+            st.info(f"💡 Explanation: {explanation}")
+            
+    st.write("---") 
+
+# Show score dynamically at the bottom
+st.markdown(f"## 📊 Current Score: {score} out of {total}")
+
+# Trigger a fun animation if they finish the whole worksheet
+if answered_count == total and total > 0:
+    st.balloons()
+
+# Restart button increments the counter to wipe all radio buttons blank
+if st.button("Restart Test"):
+    st.session_state[reset_key] += 1 
+    st.rerun()
