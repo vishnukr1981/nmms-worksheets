@@ -48,7 +48,7 @@ def run():
             st.session_state.failed = False
             st.session_state.message = "You have a fresh leaf on the bench. What is your first step?"
 
-      # Map the leaf states to your actual image files
+        # Map the leaf states to your actual uploaded image files in the assets folder
         image_map = {
             "Green 🟩": "assets/fresh_leaf.png",
             "Pale White ⬜": "assets/boiled_leaf.png",
@@ -58,10 +58,11 @@ def run():
 
         current_image_path = image_map.get(st.session_state.leaf_color)
 
+        # Display your real uploaded images dynamically
         try:
             st.image(current_image_path, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
         except Exception as e:
-            st.error(f"Waiting for image upload: {current_image_path}")
+            st.error(f"Could not load image at: {current_image_path}. Check file names in the assets folder.")
         
         st.info(f"📋 **Lab Notes:** {st.session_state.message}")
         st.markdown("---")
