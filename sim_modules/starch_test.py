@@ -48,22 +48,21 @@ def run():
             st.session_state.failed = False
             st.session_state.message = "You have a fresh leaf on the bench. What is your first step?"
 
-       # High-resolution real leaf photos hosted online
+        # High-resolution real leaf photos hosted online
         image_map = {
             "Green 🟩": "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80",
             "Pale White ⬜": "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80",
             "Brown/Yellow 🟫 (Failed)": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
             "Blue-Black ⬛ (Success!)": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80"
         }
-        }
 
         current_image_path = image_map.get(st.session_state.leaf_color)
 
-        # Display your real uploaded images dynamically
+        # Display your real images dynamically
         try:
             st.image(current_image_path, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
         except Exception as e:
-            st.error(f"Could not load image at: {current_image_path}. Check file names in the assets folder.")
+            st.error(f"Could not load image at: {current_image_path}.")
         
         st.info(f"📋 **Lab Notes:** {st.session_state.message}")
         st.markdown("---")
