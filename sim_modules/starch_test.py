@@ -48,12 +48,13 @@ def run():
             st.session_state.failed = False
             st.session_state.message = "You have a fresh leaf on the bench. What is your first step?"
 
-        # Map the leaf states to your actual uploaded image files in the assets folder
+       # High-resolution real leaf photos hosted online
         image_map = {
-            "Green 🟩": "assets/fresh_leaf.png",
-            "Pale White ⬜": "assets/boiled_leaf.png",
-            "Brown/Yellow 🟫 (Failed)": "assets/failed_leaf.png",
-            "Blue-Black ⬛ (Success!)": "assets/success_leaf.png"
+            "Green 🟩": "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80",
+            "Pale White ⬜": "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80",
+            "Brown/Yellow 🟫 (Failed)": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
+            "Blue-Black ⬛ (Success!)": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80"
+        }
         }
 
         current_image_path = image_map.get(st.session_state.leaf_color)
