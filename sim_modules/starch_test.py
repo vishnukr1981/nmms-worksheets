@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+import os
 
 def run():
     st.header("🍃 The Starch Test")
@@ -48,7 +49,7 @@ def run():
             st.session_state.failed = False
             st.session_state.message = "You have a fresh leaf on the bench. What is your first step?"
 
-      # Map the leaf states to your actual local image files in the assets folder
+        # Map to your exact filenames in the assets folder
         image_map = {
             "Green 🟩": "assets/fresh_leaf.png",
             "Pale White ⬜": "assets/boiled_leaf.png",
@@ -57,12 +58,16 @@ def run():
         }
 
         current_image_path = image_map.get(st.session_state.leaf_color)
+        raw_github_url = f"https://raw.githubusercontent.com/vishnukr1981/nmms-worksheets/main/{current_image_path}"
 
-        # Display your real images dynamically
+        # Display image (loads locally or falls back to raw repo link)
         try:
-            st.image(current_image_path, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
+            if os.path.exists(current_image_path):
+                st.image(current_image_path, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
+            else:
+                st.image(raw_github_url, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
         except Exception as e:
-            st.error(f"Could not load image at: {current_image_path}.")
+            st.error(f"Could not load image: {current_image_path}")
         
         st.info(f"📋 **Lab Notes:** {st.session_state.message}")
         st.markdown("---")
@@ -146,12 +151,11 @@ def run():
             st.session_state.starch_quiz_submitted = False
             st.session_state.starch_quiz_score = 0
             
-        # Hardcoded randomized structure for the anchor module
+        # Shuffled options
         q1_opts = ["To extract chlorophyll", "To break down cell walls", "To add starch", "To soften the leaf"]
         q2_opts = ["Water", "Iodine", "Methylated Spirit", "Hydrochloric Acid"]
         q3_opts = ["Brown", "Pale White", "Blue-Black", "Red"]
         
-        # We use a quick trick to keep options stable per session but functionally shuffled
         if 'q1_shuffled' not in st.session_state:
             st.session_state.q1_shuffled = random.sample(q1_opts, len(q1_opts))
             st.session_state.q2_shuffled = random.sample(q2_opts, len(q2_opts))
