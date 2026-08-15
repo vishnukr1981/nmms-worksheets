@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+import os
 
 def run():
     st.header("🍃 The Starch Test")
@@ -48,20 +49,23 @@ def run():
             st.session_state.failed = False
             st.session_state.message = "You have a fresh leaf on the bench. What is your first step?"
 
-        # High-stability image links corresponding to each lab state
+        # Map to your local assets files using robust path resolution
         image_map = {
-            "Green 🟩": "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80",
-            "Pale White ⬜": "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80",
-            "Brown/Yellow 🟫 (Failed)": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
-            "Blue-Black ⬛ (Success!)": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80"
+            "Green 🟩": os.path.join("assets", "fresh_leaf.png"),
+            "Pale White ⬜": os.path.join("assets", "boiled_leaf.png"),
+            "Brown/Yellow 🟫 (Failed)": os.path.join("assets", "failed_leaf.png"),
+            "Blue-Black ⬛ (Success!)": os.path.join("assets", "success_leaf.png")
         }
 
         current_image_path = image_map.get(st.session_state.leaf_color)
 
         try:
-            st.image(current_image_path, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
+            if os.path.exists(current_image_path):
+                st.image(current_image_path, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
+            else:
+                st.warning(f"Looking for image file at: {current_image_path}. Please ensure the real binary image file is uploaded to the assets folder.")
         except Exception as e:
-            st.error("Could not load simulation image.")
+            st.error(f"Could not load image: {current_image_path}")
         
         st.info(f"📋 **Lab Notes:** {st.session_state.message}")
         st.markdown("---")
@@ -140,7 +144,6 @@ def run():
         st.subheader("Laboratory Review Quiz")
         st.write("Test your understanding of the chemical reactions you just performed!")
         
-        # Initialize quiz state
         if 'starch_quiz_score' not in st.session_state:
             st.session_state.starch_quiz_submitted = False
             st.session_state.starch_quiz_score = 0
