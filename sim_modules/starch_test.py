@@ -48,24 +48,20 @@ def run():
             st.session_state.failed = False
             st.session_state.message = "You have a fresh leaf on the bench. What is your first step?"
 
-        color_map = {
-            "Green 🟩": "#4CAF50",
-            "Pale White ⬜": "#F5F5F5",
-            "Brown/Yellow 🟫 (Failed)": "#964B00",
-            "Blue-Black ⬛ (Success!)": "#000033"
+      # Map the leaf states to your actual image files
+        image_map = {
+            "Green 🟩": "assets/fresh_leaf.png",
+            "Pale White ⬜": "assets/boiled_leaf.png",
+            "Brown/Yellow 🟫 (Failed)": "assets/failed_leaf.png",
+            "Blue-Black ⬛ (Success!)": "assets/success_leaf.png"
         }
-        
-        leaf_hex = color_map.get(st.session_state.leaf_color, "#4CAF50")
-        text_color = 'white' if leaf_hex in ['#4CAF50', '#000033', '#964B00'] else 'black'
-        
-        st.markdown(
-            f"""
-            <div style="background-color: {leaf_hex}; padding: 40px; border-radius: 15px; border: 3px solid #ccc; text-align: center; margin-bottom: 20px; transition: background-color 0.5s ease;">
-                <h2 style="color: {text_color}; margin: 0;">Current Leaf Status: {st.session_state.leaf_color}</h2>
-            </div>
-            """, 
-            unsafe_allow_html=True
-        )
+
+        current_image_path = image_map.get(st.session_state.leaf_color)
+
+        try:
+            st.image(current_image_path, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
+        except Exception as e:
+            st.error(f"Waiting for image upload: {current_image_path}")
         
         st.info(f"📋 **Lab Notes:** {st.session_state.message}")
         st.markdown("---")
