@@ -1,6 +1,5 @@
 import streamlit as st
 import random
-import os
 
 def run():
     st.header("🍃 The Starch Test")
@@ -49,25 +48,20 @@ def run():
             st.session_state.failed = False
             st.session_state.message = "You have a fresh leaf on the bench. What is your first step?"
 
-        # Map to your exact filenames in the assets folder
+        # High-stability image links corresponding to each lab state
         image_map = {
-            "Green 🟩": "assets/fresh_leaf.png",
-            "Pale White ⬜": "assets/boiled_leaf.png",
-            "Brown/Yellow 🟫 (Failed)": "assets/failed_leaf.png",
-            "Blue-Black ⬛ (Success!)": "assets/success_leaf.png"
+            "Green 🟩": "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80",
+            "Pale White ⬜": "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80",
+            "Brown/Yellow 🟫 (Failed)": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
+            "Blue-Black ⬛ (Success!)": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80"
         }
 
         current_image_path = image_map.get(st.session_state.leaf_color)
-        raw_github_url = f"https://raw.githubusercontent.com/vishnukr1981/nmms-worksheets/main/{current_image_path}"
 
-        # Display image (loads locally or falls back to raw repo link)
         try:
-            if os.path.exists(current_image_path):
-                st.image(current_image_path, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
-            else:
-                st.image(raw_github_url, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
+            st.image(current_image_path, caption=f"Current Status: {st.session_state.leaf_color}", use_container_width=True)
         except Exception as e:
-            st.error(f"Could not load image: {current_image_path}")
+            st.error("Could not load simulation image.")
         
         st.info(f"📋 **Lab Notes:** {st.session_state.message}")
         st.markdown("---")
@@ -151,7 +145,6 @@ def run():
             st.session_state.starch_quiz_submitted = False
             st.session_state.starch_quiz_score = 0
             
-        # Shuffled options
         q1_opts = ["To extract chlorophyll", "To break down cell walls", "To add starch", "To soften the leaf"]
         q2_opts = ["Water", "Iodine", "Methylated Spirit", "Hydrochloric Acid"]
         q3_opts = ["Brown", "Pale White", "Blue-Black", "Red"]
